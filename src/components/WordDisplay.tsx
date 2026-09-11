@@ -6,11 +6,13 @@ type WordDisplayProps = {
   words: readonly string[]
   /** Indexed by Unicode code point in words.join(' '), including spaces. */
   characterStates?: readonly CharacterState[]
+  isFinished?: boolean
 }
 
 export default function WordDisplay({
   words,
   characterStates = [],
+  isFinished = false,
 }: WordDisplayProps) {
   const wordsRef = useRef<HTMLParagraphElement>(null)
   const currentPosition = characterStates.indexOf('current')
@@ -34,9 +36,9 @@ export default function WordDisplay({
   return (
     <div
       role="region"
-      aria-label="Typing words. Type to begin. Use Backspace to correct."
-      tabIndex={0}
-      onClick={(event) => event.currentTarget.focus()}
+      aria-label={isFinished ? 'Typing words. Test finished.' : 'Typing words. Type to begin. Use Backspace to correct.'}
+      tabIndex={isFinished ? -1 : 0}
+      onClick={(event) => { if (!isFinished) event.currentTarget.focus() }}
       className="w-full min-w-0 rounded-sm"
     >
       {/* Keep three complete lines visible as the words wrap at each screen size. */}

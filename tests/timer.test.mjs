@@ -1,9 +1,49 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { updateTypingSession } from '../src/utils/typing.ts'
-import { getRemainingSeconds } from '../src/utils/timer.ts'
+import { getTypingProgress, updateTypingSession } from '../src/utils/typing.ts'
+import { getRemainingSeconds, getTestStatus } from '../src/utils/timer.ts'
 
 const idle = () => ({ typedCharacters: [], startedAt: null })
+
+test('timed tests become finished at the deadline without another keystroke', () => {
+  for (const duration of [15, 30, 60, 120]) {
+    const session = updateTypingSession(idle(), 'c', 7, 1000, duration)
+    const deadline = 1000 + duration * 1000
+    assert.equal(getTestStatus(null, duration), 'idle')
+    assert.equal(getTestStatus(session.startedAt,
+      getRemainingSeconds(duration, session.startedAt, deadline - 1)), 'running')
+    assert.equal(getTestStatus(session.startedAt,
+      getRemainingSeconds(duration, session.startedAt, deadline)), 'finished')
+  }
+})
+
+test('the deadline blocks characters, spaces, and backspace even before the next timer callback', () => {
+  const session = updateTypingSession(idle(), 'c', 7, 1000, 15)
+  assert.deepEqual(updateTypingSession(session, 'a', 7, 15999, 15).typedCharacters, ['c', 'a'])
+  for (const now of [16000, 16001, 100000]) {
+    for (const key of ['a', ' ', 'Backspace']) {
+      assert.equal(updateTypingSession(session, key, 7, now, 15), session)
+    }
+  }
+})
+
+test('finished display preserves feedback and position but removes the current caret', () => {
+  const progress = getTypingProgress(['cat', 'dog'], Array.from('cx'), true)
+  assert.deepEqual(progress.characterStates,
+    ['correct', 'incorrect', 'untyped', 'untyped', 'untyped', 'untyped', 'untyped'])
+  assert.equal(progress.position, 2)
+  assert.equal(progress.currentWordIndex, 0)
+  assert.equal(progress.currentCharacterIndex, 2)
+})
+
+test('Words mode remains untimed and a reset allows a fresh timed session', () => {
+  const session = updateTypingSession(idle(), 'c', 7, 1000, null)
+  assert.equal(getTestStatus(session.startedAt, null), 'running')
+  assert.deepEqual(updateTypingSession(session, 'a', 7, 100000, null).typedCharacters, ['c', 'a'])
+  const fresh = updateTypingSession(idle(), 'd', 7, 100000, 30)
+  assert.equal(fresh.startedAt, 100000)
+  assert.equal(getTestStatus(fresh.startedAt, getRemainingSeconds(30, fresh.startedAt, 100000)), 'running')
+})
 
 test('timer stays idle for every duration until a character is accepted', () => {
   for (const duration of [15, 30, 60, 120]) {

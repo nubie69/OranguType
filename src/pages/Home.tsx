@@ -5,7 +5,6 @@ import TimerDisplay from '../components/TimerDisplay'
 import WordDisplay from '../components/WordDisplay'
 import { generateWords } from '../utils/generateWords'
 import useTypingInput from '../hooks/useTypingInput'
-import useCountdown from '../hooks/useCountdown'
 import type { TestSettings } from '../types/test'
 
 export default function Home() {
@@ -18,8 +17,10 @@ export default function Home() {
   const words = settings.mode === 'words'
     ? generatedWords.slice(0, settings.words)
     : generatedWords
-  const { characterStates, startedAt, resetInput } = useTypingInput(words)
-  const remainingSeconds = useCountdown(settings.mode === 'time' ? settings.time : null, startedAt)
+  const { characterStates, remainingSeconds, status, resetInput } = useTypingInput(
+    words,
+    settings.mode === 'time' ? settings.time : null,
+  )
 
   function handleSettingsChange(nextSettings: TestSettings) {
     setSettings(nextSettings)
@@ -30,6 +31,7 @@ export default function Home() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-6 py-12 sm:py-16">
       <section
         aria-labelledby="typing-test-heading"
+        data-test-status={status}
         className="w-full min-w-0 max-w-4xl space-y-6 sm:space-y-8"
       >
         <h1
@@ -41,8 +43,13 @@ export default function Home() {
         <TestModeSelector settings={settings} onChange={handleSettingsChange} />
         {remainingSeconds !== null && <TimerDisplay seconds={remainingSeconds} />}
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[var(--color-text-secondary)]/20 p-6 sm:min-h-80 sm:p-10">
-          <WordDisplay words={words} characterStates={characterStates} />
+          <WordDisplay words={words} characterStates={characterStates} isFinished={status === 'finished'} />
         </div>
+        {status === 'finished' && (
+          <p role="status" className="text-center text-[var(--color-accent)]">
+            Time’s up. Test finished.
+          </p>
+        )}
         <div className="flex justify-center">
           <RestartButton />
         </div>

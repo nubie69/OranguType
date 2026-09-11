@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react'
 import { getTypingProgress, updateTypingSession } from '../utils/typing'
 import type { TypingSession } from '../utils/typing'
+import { getTestStatus } from '../utils/timer'
+import useCountdown from './useCountdown'
 
-export default function useTypingInput(words: readonly string[]) {
+export default function useTypingInput(words: readonly string[], duration: number | null = null) {
   const [session, setSession] = useState<TypingSession>({
     typedCharacters: [],
     startedAt: null,
   })
   const { typedCharacters, startedAt } = session
   const characterCount = Array.from(words.join(' ')).length
+  const remainingSeconds = useCountdown(duration, startedAt)
+  const status = getTestStatus(startedAt, remainingSeconds)
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -26,15 +30,17 @@ export default function useTypingInput(words: readonly string[]) {
 
       event.preventDefault()
       const now = performance.now()
-      setSession((current) => updateTypingSession(current, event.key, characterCount, now))
+      setSession((current) => updateTypingSession(current, event.key, characterCount, now, duration))
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [characterCount])
+  }, [characterCount, duration])
 
   return {
-    ...getTypingProgress(words, typedCharacters),
+    ...getTypingProgress(words, typedCharacters, status === 'finished'),
+    status,
+    remainingSeconds,
     typedCharacters,
     startedAt,
     resetInput: () => setSession({ typedCharacters: [], startedAt: null }),

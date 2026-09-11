@@ -10,6 +10,74 @@ test('starts at the first word and character with a current caret', () => {
   assert.deepEqual(progress.characterStates, ['current', ...Array(6).fill('untyped')])
 })
 
+test('marks each matching character correct, including spaces and the final character', () => {
+  const words = ['cat', 'dog']
+  const expected = Array.from(words.join(' '))
+  let typed = []
+
+  for (const character of expected) {
+    typed = updateTypedCharacters(typed, character, expected.length)
+    const { characterStates } = getTypingProgress(words, typed)
+    assert.deepEqual(characterStates.slice(0, typed.length), Array(typed.length).fill('correct'))
+    if (typed.length < expected.length) {
+      assert.equal(characterStates[typed.length], 'current')
+      assert.ok(characterStates.slice(typed.length + 1).every((state) => state === 'untyped'))
+    }
+  }
+})
+
+test('only exact matches are correct and an earlier mistake does not block later matches', () => {
+  const { characterStates } = getTypingProgress(['cat'], Array.from('Cat'))
+  assert.deepEqual(characterStates, ['incorrect', 'correct', 'correct'])
+})
+
+test('marks a mismatch at any position incorrect while preserving all matching characters', () => {
+  const words = ['cat', 'dog']
+  const expected = Array.from(words.join(' '))
+
+  for (let mismatchIndex = 0; mismatchIndex < expected.length; mismatchIndex += 1) {
+    const input = [...expected]
+    input[mismatchIndex] = expected[mismatchIndex] === ' ' ? 'x' : ' '
+    let typed = []
+    for (const key of input) typed = updateTypedCharacters(typed, key, expected.length)
+
+    assert.deepEqual(getTypingProgress(words, typed).characterStates,
+      expected.map((_, index) => index === mismatchIndex ? 'incorrect' : 'correct'))
+  }
+})
+
+test('consecutive wrong characters keep the caret moving and leave future characters untyped', () => {
+  let typed = []
+  for (const key of 'xyz') typed = updateTypedCharacters(typed, key, 7)
+  const progress = getTypingProgress(['cat', 'dog'], typed)
+  assert.deepEqual(progress.characterStates,
+    ['incorrect', 'incorrect', 'incorrect', 'current', 'untyped', 'untyped', 'untyped'])
+  assert.equal(progress.position, 3)
+  assert.equal(progress.currentWordIndex, 0)
+  assert.equal(progress.currentCharacterIndex, 3)
+})
+
+test('replacing a correct character with a wrong one removes its correct state', () => {
+  let typed = Array.from('cat')
+  typed = updateTypedCharacters(typed, 'Backspace', 3)
+  typed = updateTypedCharacters(typed, 'x', 3)
+  assert.deepEqual(getTypingProgress(['cat'], typed).characterStates,
+    ['correct', 'correct', 'incorrect'])
+  typed = updateTypedCharacters(typed, 'Backspace', 3)
+  assert.deepEqual(getTypingProgress(['cat'], typed).characterStates,
+    ['correct', 'correct', 'current'])
+})
+
+test('retyping a mistake correctly applies the correct state', () => {
+  let typed = Array.from('cx')
+  assert.equal(getTypingProgress(['cat'], typed).characterStates[1], 'incorrect')
+  typed = updateTypedCharacters(typed, 'Backspace', 3)
+  assert.equal(getTypingProgress(['cat'], typed).characterStates[1], 'current')
+  typed = updateTypedCharacters(typed, 'a', 3)
+  assert.deepEqual(getTypingProgress(['cat'], typed).characterStates,
+    ['correct', 'correct', 'current'])
+})
+
 test('tracks correct and incorrect input and advances across word separators', () => {
   let typed = []
   for (const key of 'cax ') typed = updateTypedCharacters(typed, key, 7)

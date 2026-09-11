@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import RestartButton from '../components/RestartButton'
 import TestModeSelector from '../components/TestModeSelector'
 import TimerDisplay from '../components/TimerDisplay'
 import WordDisplay from '../components/WordDisplay'
-import { sampleWords } from '../data/sampleWords'
+import { generateWords } from '../utils/generateWords'
 import { demoCharacterStates } from '../data/demoCharacterStates'
 import type { TestSettings } from '../types/test'
 
@@ -12,6 +13,10 @@ export default function Home() {
     time: 30,
     words: 25,
   })
+  const [generatedWords] = useState(() => generateWords(100))
+  const words = settings.mode === 'words'
+    ? generatedWords.slice(0, settings.words)
+    : generatedWords
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-6 py-12 sm:py-16">
@@ -28,7 +33,10 @@ export default function Home() {
         <TestModeSelector settings={settings} onChange={setSettings} />
         {settings.mode === 'time' && <TimerDisplay seconds={settings.time} />}
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[var(--color-text-secondary)]/20 p-6 sm:min-h-80 sm:p-10">
-          <WordDisplay words={sampleWords} characterStates={demoCharacterStates} />
+          <WordDisplay words={words} characterStates={demoCharacterStates} />
+        </div>
+        <div className="flex justify-center">
+          <RestartButton />
         </div>
       </section>
     </main>

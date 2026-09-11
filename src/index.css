@@ -9,6 +9,36 @@
   --color-error: #fb7185;
 }
 
+@keyframes typing-caret-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@layer components {
+  .typing-caret {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 2px;
+    height: 1.1em;
+    border-radius: 999px;
+    background-color: var(--color-accent);
+    transform: translateY(-50%);
+    pointer-events: none;
+    animation: typing-caret-blink 1.2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typing-caret {
+      animation: none;
+    }
+  }
+}
+
 @layer base {
   body {
     margin: 0;

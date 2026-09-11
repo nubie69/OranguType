@@ -1,4 +1,5 @@
 import type { CharacterState } from '../types/character'
+import TypingCaret from './TypingCaret'
 
 type CharacterProps = {
   character: string
@@ -11,12 +12,13 @@ const stateClasses: Record<CharacterState, string> = {
   incorrect:
     'bg-[var(--color-error)]/10 text-[var(--color-error)] underline decoration-2 underline-offset-4',
   current:
-    'bg-[var(--color-accent)]/10 text-[var(--color-accent)] shadow-[inset_2px_0_0_var(--color-accent)]',
+    'bg-[var(--color-accent)]/10 text-[var(--color-accent)]',
 }
 
 export default function Character({ character, state = 'untyped' }: CharacterProps) {
   return (
-    <span data-state={state} className={stateClasses[state]}>
+    <span data-state={state} className={`relative ${stateClasses[state]}`}>
+      {state === 'current' && <TypingCaret />}
       {character}
     </span>
   )

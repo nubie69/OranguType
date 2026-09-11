@@ -10,12 +10,13 @@ export default function Navbar({ page }: { page: string }) {
           aria-label="TypeLab home"
           className="flex items-center gap-3 rounded-sm text-[var(--color-text-primary)]"
         >
-          <span
-            aria-hidden="true"
-            className="flex size-10 items-center justify-center rounded-lg bg-[var(--color-accent)] font-bold tracking-tight text-[var(--color-background)]"
-          >
-            TL
-          </span>
+          <img
+            src={`${import.meta.env.BASE_URL}logo.png`}
+            alt=""
+            width={40}
+            height={40}
+            className="size-10 shrink-0 rounded-lg object-cover"
+          />
           <span className="text-xl font-semibold tracking-tight">TypeLab</span>
         </a>
 

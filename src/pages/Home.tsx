@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import RestartButton from '../components/RestartButton'
 import TestModeSelector from '../components/TestModeSelector'
 import TimerDisplay from '../components/TimerDisplay'
+import TestResults from '../components/TestResults'
 import WordDisplay from '../components/WordDisplay'
 import { generateWords } from '../utils/generateWords'
 import useTypingInput from '../hooks/useTypingInput'
@@ -22,7 +23,7 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
   const words = settings.mode === 'words'
     ? generatedWords.slice(0, settings.words)
     : generatedWords
-  const { characterStates, remainingSeconds, status, resetInput, typedCharacters, elapsedSeconds } = useTypingInput(
+  const { characterStates, remainingSeconds, status, resetInput, typedCharacters, elapsedSeconds, performanceSeries } = useTypingInput(
     words,
     settings.mode === 'time' ? settings.time : null,
   )
@@ -70,9 +71,8 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
           <WordDisplay ref={wordDisplayRef} words={words} characterStates={characterStates} isFinished={status === 'finished'} />
         </div>
         {status === 'finished' && (
-          <p role="status" className="text-center text-[var(--color-accent)]">
-            Test finished. {result.wpm} WPM · {result.accuracy}% accuracy
-          </p>
+          <TestResults wpm={result.wpm} accuracy={result.accuracy} elapsedSeconds={elapsedSeconds}
+            points={performanceSeries} timedOut={settings.mode === 'time' && elapsedSeconds === settings.time} />
         )}
         <div className="flex justify-center">
           <RestartButton onRestart={handleRestart} />

@@ -1,4 +1,31 @@
 import type { TestSettings } from '../types/test.ts'
+import { updateTypedCharacters } from './typing.ts'
+import type { TypingSession } from './typing.ts'
+
+export type PerformancePoint = { seconds: number; wpm: number; accuracy: number }
+
+/** Replay accepted input at one-second boundaries, including pauses and corrections. */
+export function getPerformanceSeries(words: readonly string[], session: TypingSession, elapsedSeconds: number): PerformancePoint[] {
+  if (session.startedAt === null || elapsedSeconds <= 0) return []
+  const inputs = session.inputs ?? []
+  const characterCount = Array.from(words.join(' ')).length
+  const points: PerformancePoint[] = []
+  let typed: readonly string[] = []
+  let inputIndex = 0
+  // Bound chart size for unusually long count-based sessions.
+  const interval = Math.max(1, Math.ceil(elapsedSeconds / 300))
+  for (let next = interval; ; next += interval) {
+    const seconds = Math.min(next, elapsedSeconds)
+    while (inputIndex < inputs.length && inputs[inputIndex].at - session.startedAt <= seconds * 1000) {
+      typed = updateTypedCharacters(typed, inputs[inputIndex].key, characterCount)
+      inputIndex += 1
+    }
+    const { wpm, accuracy } = calculateStats(words, typed, seconds)
+    points.push({ seconds, wpm, accuracy })
+    if (seconds === elapsedSeconds) break
+  }
+  return points
+}
 
 export type TestResult = TestSettings & {
   id: string

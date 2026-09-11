@@ -5,6 +5,7 @@ export type TypingSession = {
   typedCharacters: readonly string[]
   startedAt: number | null
   finishedAt?: number
+  inputs?: readonly { at: number; key: string }[]
 }
 
 export function createTypingSession(): TypingSession {
@@ -29,6 +30,7 @@ export function updateTypingSession(
 
   return {
     typedCharacters,
+    inputs: [...(session.inputs ?? []), { at: now, key }],
     ...(finishWhenComplete && typedCharacters.length === characterCount
       ? { finishedAt: now } : {}),
     // Keep the first accepted character's timestamp, even after deleting all input.

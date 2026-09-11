@@ -3,6 +3,7 @@ import { createTypingSession, getTypingProgress, updateTypingSession } from '../
 import type { TypingSession } from '../utils/typing'
 import { getTestStatus } from '../utils/timer'
 import useCountdown from './useCountdown'
+import { getPerformanceSeries } from '../utils/stats'
 
 export default function useTypingInput(words: readonly string[], duration: number | null = null) {
   const [session, setSession] = useState<TypingSession>(createTypingSession)
@@ -34,15 +35,18 @@ export default function useTypingInput(words: readonly string[], duration: numbe
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [characterCount, duration])
 
+  const elapsedSeconds = startedAt === null ? 0 : session.finishedAt !== undefined
+    ? Math.max(0.001, (session.finishedAt - startedAt) / 1000)
+    : status === 'finished' ? duration ?? 0 : 0
+
   return {
     ...getTypingProgress(words, typedCharacters, status === 'finished'),
     status,
     remainingSeconds,
     typedCharacters,
     startedAt,
-    elapsedSeconds: startedAt === null ? 0 : session.finishedAt !== undefined
-      ? Math.max(0.001, (session.finishedAt - startedAt) / 1000)
-      : status === 'finished' ? duration ?? 0 : 0,
+    elapsedSeconds,
+    performanceSeries: status === 'finished' ? getPerformanceSeries(words, session, elapsedSeconds) : [],
     resetInput: () => setSession(createTypingSession()),
   }
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { TestResult } from '../utils/stats'
+import { categoryDetails, practiceCategories } from '../types/test'
 
 export default function Stats({ results, history, storageError }: {
   results: TestResult[]
@@ -25,8 +26,7 @@ export default function Stats({ results, history, storageError }: {
           <select value={category} onChange={event => setCategory(event.target.value)}
             className="min-h-11 rounded-lg border border-[var(--color-text-secondary)]/30 bg-[var(--color-background)] px-3">
             <option value="all">All categories</option>
-            <option value="english">English</option>
-            <option value="numbers">Numbers</option>
+            {practiceCategories.map(value => <option key={value} value={value}>{categoryDetails[value].label}</option>)}
           </select>
         </label>
       </div>
@@ -53,7 +53,7 @@ export default function Stats({ results, history, storageError }: {
               <tbody>{filtered.slice(0, history ? 100 : 10).map(result => <tr key={result.id} className="border-t border-[var(--color-text-secondary)]/20">
                 <td className="p-4">{new Date(result.completedAt).toLocaleString()}</td>
                 <td className="p-4 capitalize">{result.category}</td>
-                <td className="p-4">{result.mode === 'time' ? `${result.time}s` : `${result.words} ${result.category === 'numbers' ? 'groups' : 'words'}`}</td>
+                <td className="p-4">{result.mode === 'time' ? `${result.time}s` : `${result.words} ${categoryDetails[result.category].unit}`}</td>
                 <td className="p-4 text-[var(--color-accent)]">{result.wpm}</td>
                 <td className="p-4">{result.accuracy}%</td>
                 <td className="p-4">{result.elapsedSeconds.toFixed(1)}s</td>

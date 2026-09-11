@@ -1,4 +1,5 @@
 import type { TestSettings } from '../types/test.ts'
+import { practiceCategories } from '../types/test.ts'
 import { updateTypedCharacters } from './typing.ts'
 import type { TypingSession } from './typing.ts'
 
@@ -58,7 +59,7 @@ export function parseResults(raw: string | null): TestResult[] {
       && typeof value === 'object'
       && typeof value.id === 'string'
       && typeof value.completedAt === 'string' && Number.isFinite(Date.parse(value.completedAt))
-      && ['english', 'numbers'].includes(value.category)
+      && practiceCategories.includes(value.category)
       && ['time', 'words'].includes(value.mode)
       && [15, 30, 60, 120].includes(value.time)
       && [10, 25, 50, 100].includes(value.words)

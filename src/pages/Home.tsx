@@ -7,6 +7,7 @@ import WordDisplay from '../components/WordDisplay'
 import { generateWords } from '../utils/generateWords'
 import useTypingInput from '../hooks/useTypingInput'
 import type { TestSettings } from '../types/test'
+import { categoryDetails } from '../types/test'
 import { calculateStats } from '../utils/stats'
 import type { TestResult } from '../utils/stats'
 
@@ -97,6 +98,7 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
           <>
             <div className="practice-settings rounded-2xl border border-[var(--color-text-secondary)]/15 bg-[var(--color-surface)] p-4 sm:p-5">
               <TestModeSelector settings={settings} onChange={handleSettingsChange} />
+              <p className="mt-3 text-center text-xs text-[var(--color-text-secondary)]">{categoryDetails[settings.category].description}{settings.mode === 'words' ? ` This test has ${settings.words} ${categoryDetails[settings.category].unit}.` : ''}</p>
             </div>
             <div className="grid grid-cols-3 gap-3 sm:gap-4" aria-live="off">
               <div className="metric-card"><span className="metric-label">{remainingSeconds !== null ? 'Seconds left' : 'Progress'}</span>{remainingSeconds !== null ? <TimerDisplay seconds={remainingSeconds} /> : <strong className="metric-value">{Math.round(progress)}<span className="text-lg">%</span></strong>}</div>
@@ -106,7 +108,7 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
             <div className={`typing-stage overflow-hidden rounded-3xl border bg-[var(--color-surface)] transition-colors ${status === 'running' ? 'border-[var(--color-accent)]/50' : 'border-[var(--color-text-secondary)]/20'}`}>
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-text-secondary)]/10 px-5 py-4 sm:px-8">
               <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest"><span className={`size-2 rounded-full ${status === 'running' ? 'bg-[var(--color-chart-secondary)]' : 'bg-[var(--color-accent)]'}`} />{status === 'running' ? 'In the flow' : 'Ready when you are'}</span>
-              <span className="text-xs text-[var(--color-text-secondary)]">{settings.category === 'numbers' ? 'Number practice' : 'English practice'} · {settings.mode === 'time' ? `${settings.time} seconds` : `${settings.words} ${settings.category === 'numbers' ? 'groups' : 'words'}`}</span>
+              <span className="text-xs text-[var(--color-text-secondary)]">{categoryDetails[settings.category].label} practice · {settings.mode === 'time' ? `${settings.time} seconds` : `${settings.words} ${categoryDetails[settings.category].unit}`}</span>
             </div>
             <div className="flex min-h-60 items-center p-5 sm:min-h-72 sm:p-8">
               <WordDisplay ref={wordDisplayRef} words={words} characterStates={characterStates} />

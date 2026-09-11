@@ -1,4 +1,14 @@
+import { useState } from 'react'
+import TestModeSelector from '../components/TestModeSelector'
+import type { TestSettings } from '../types/test'
+
 export default function Home() {
+  const [settings, setSettings] = useState<TestSettings>({
+    mode: 'time',
+    time: 30,
+    words: 25,
+  })
+
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center px-6 py-12 sm:py-16">
       <section
@@ -11,6 +21,7 @@ export default function Home() {
         >
           Typing test
         </h1>
+        <TestModeSelector settings={settings} onChange={setSettings} />
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[var(--color-text-secondary)]/20 p-6 sm:min-h-80 sm:p-10">
           <p className="max-w-sm text-center text-sm leading-relaxed text-[var(--color-text-secondary)] sm:text-base">
             Your typing test will appear here.

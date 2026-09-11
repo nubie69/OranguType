@@ -7,7 +7,7 @@ export default function Navbar({ page }: { page: string }) {
       >
         <a
           href="#type"
-          aria-label="TypeLab home"
+          aria-label="OranguType home"
           className="flex items-center gap-3 rounded-sm text-[var(--color-text-primary)]"
         >
           <img
@@ -17,7 +17,7 @@ export default function Navbar({ page }: { page: string }) {
             height={40}
             className="size-10 shrink-0 rounded-lg object-cover"
           />
-          <span className="text-xl font-semibold tracking-tight">TypeLab</span>
+          <span className="text-xl font-semibold tracking-tight">OranguType</span>
         </a>
 
         <ul className="order-last flex w-full items-center justify-center gap-8 text-sm font-medium sm:order-none sm:w-auto sm:justify-start">

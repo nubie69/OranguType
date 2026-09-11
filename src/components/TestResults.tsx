@@ -60,7 +60,7 @@ export default function TestResults({ wpm, accuracy, elapsedSeconds, points, tim
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <LineGraph points={points} metric="wpm" label="WPM" color="var(--color-accent)" />
-        <LineGraph points={points} metric="accuracy" label="Accuracy" color="#a78bfa" />
+        <LineGraph points={points} metric="accuracy" label="Accuracy" color="var(--color-chart-secondary)" />
       </div>
       <p className="text-xs text-[var(--color-text-secondary)]">Each point measures your overall performance up to that time. WPM uses five correct characters per word; accuracy reflects typed text after corrections.</p>
       <details className="text-sm">

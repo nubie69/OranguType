@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import RestartButton from '../components/RestartButton'
 import TestModeSelector from '../components/TestModeSelector'
 import TimerDisplay from '../components/TimerDisplay'
@@ -13,7 +13,8 @@ export default function Home() {
     time: 30,
     words: 25,
   })
-  const [generatedWords] = useState(() => generateWords(100))
+  const [generatedWords, setGeneratedWords] = useState(() => generateWords(100))
+  const wordDisplayRef = useRef<HTMLDivElement>(null)
   const words = settings.mode === 'words'
     ? generatedWords.slice(0, settings.words)
     : generatedWords
@@ -25,6 +26,12 @@ export default function Home() {
   function handleSettingsChange(nextSettings: TestSettings) {
     setSettings(nextSettings)
     resetInput()
+  }
+
+  function handleRestart() {
+    setGeneratedWords(generateWords(100))
+    resetInput()
+    wordDisplayRef.current?.focus({ preventScroll: true })
   }
 
   return (
@@ -43,7 +50,7 @@ export default function Home() {
         <TestModeSelector settings={settings} onChange={handleSettingsChange} />
         {remainingSeconds !== null && <TimerDisplay seconds={remainingSeconds} />}
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[var(--color-text-secondary)]/20 p-6 sm:min-h-80 sm:p-10">
-          <WordDisplay words={words} characterStates={characterStates} isFinished={status === 'finished'} />
+          <WordDisplay ref={wordDisplayRef} words={words} characterStates={characterStates} isFinished={status === 'finished'} />
         </div>
         {status === 'finished' && (
           <p role="status" className="text-center text-[var(--color-accent)]">
@@ -51,7 +58,7 @@ export default function Home() {
           </p>
         )}
         <div className="flex justify-center">
-          <RestartButton />
+          <RestartButton onRestart={handleRestart} />
         </div>
       </section>
     </main>

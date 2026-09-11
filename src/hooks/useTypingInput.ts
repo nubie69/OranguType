@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react'
-import { getTypingProgress, updateTypingSession } from '../utils/typing'
+import { createTypingSession, getTypingProgress, updateTypingSession } from '../utils/typing'
 import type { TypingSession } from '../utils/typing'
 import { getTestStatus } from '../utils/timer'
 import useCountdown from './useCountdown'
 
 export default function useTypingInput(words: readonly string[], duration: number | null = null) {
-  const [session, setSession] = useState<TypingSession>({
-    typedCharacters: [],
-    startedAt: null,
-  })
+  const [session, setSession] = useState<TypingSession>(createTypingSession)
   const { typedCharacters, startedAt } = session
   const characterCount = Array.from(words.join(' ')).length
   const remainingSeconds = useCountdown(duration, startedAt)
@@ -43,6 +40,6 @@ export default function useTypingInput(words: readonly string[], duration: numbe
     remainingSeconds,
     typedCharacters,
     startedAt,
-    resetInput: () => setSession({ typedCharacters: [], startedAt: null }),
+    resetInput: () => setSession(createTypingSession()),
   }
 }

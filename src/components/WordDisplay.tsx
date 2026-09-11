@@ -1,8 +1,10 @@
 import { useLayoutEffect, useRef } from 'react'
+import type { Ref } from 'react'
 import Character from './Character'
 import type { CharacterState } from '../types/character'
 
 type WordDisplayProps = {
+  ref?: Ref<HTMLDivElement>
   words: readonly string[]
   /** Indexed by Unicode code point in words.join(' '), including spaces. */
   characterStates?: readonly CharacterState[]
@@ -10,6 +12,7 @@ type WordDisplayProps = {
 }
 
 export default function WordDisplay({
+  ref,
   words,
   characterStates = [],
   isFinished = false,
@@ -35,6 +38,7 @@ export default function WordDisplay({
 
   return (
     <div
+      ref={ref}
       role="region"
       aria-label={isFinished ? 'Typing words. Test finished.' : 'Typing words. Type to begin. Use Backspace to correct.'}
       tabIndex={isFinished ? -1 : 0}

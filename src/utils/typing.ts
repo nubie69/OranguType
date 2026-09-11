@@ -6,6 +6,10 @@ export type TypingSession = {
   startedAt: number | null
 }
 
+export function createTypingSession(): TypingSession {
+  return { typedCharacters: [], startedAt: null }
+}
+
 export function updateTypingSession(
   session: TypingSession,
   key: string,

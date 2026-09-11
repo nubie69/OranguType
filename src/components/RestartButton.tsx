@@ -1,11 +1,15 @@
-export default function RestartButton() {
+type RestartButtonProps = {
+  onRestart: () => void
+}
+
+export default function RestartButton({ onRestart }: RestartButtonProps) {
   return (
     <button
       type="button"
-      aria-label="Restart test (coming soon)"
-      aria-disabled="true"
-      title="Restart test (coming soon)"
-      className="group flex size-11 cursor-default items-center justify-center rounded-lg text-[var(--color-text-secondary)] transition-colors duration-200 hover:bg-[var(--color-accent)]/10 hover:text-[var(--color-accent)] focus-visible:text-[var(--color-accent)] motion-reduce:transition-none"
+      aria-label="Restart test"
+      title="Restart test"
+      onClick={onRestart}
+      className="group flex size-11 cursor-pointer items-center justify-center rounded-lg text-[var(--color-text-secondary)] transition-colors duration-200 hover:bg-[var(--color-accent)]/10 hover:text-[var(--color-accent)] focus-visible:text-[var(--color-accent)] motion-reduce:transition-none"
     >
       <svg
         aria-hidden="true"

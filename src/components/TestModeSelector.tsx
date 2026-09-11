@@ -15,7 +15,33 @@ export default function TestModeSelector({
   onChange,
 }: TestModeSelectorProps) {
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-6">
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6">
+      <fieldset className="min-w-0">
+        <legend className="sr-only">Practice category</legend>
+        <div className="flex items-center gap-1">
+          {(['english', 'numbers'] as const).map((category) => (
+            <label key={category}>
+              <input
+                type="radio"
+                name="practice-category"
+                value={category}
+                checked={settings.category === category}
+                onChange={() => onChange({ ...settings, category })}
+                className="peer sr-only"
+              />
+              <span className={optionClassName}>
+                {category === 'english' ? 'English' : 'Numbers'}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <span
+        aria-hidden="true"
+        className="hidden h-6 w-px bg-[var(--color-text-secondary)]/20 sm:block"
+      />
+
       <fieldset className="min-w-0">
         <legend className="sr-only">Test mode</legend>
         <div className="flex items-center gap-1">
@@ -30,7 +56,7 @@ export default function TestModeSelector({
                 className="peer sr-only"
               />
               <span className={optionClassName}>
-                {mode === 'time' ? 'Time' : 'Words'}
+                {mode === 'time' ? 'Time' : settings.category === 'numbers' ? 'Count' : 'Words'}
               </span>
             </label>
           ))}
@@ -44,7 +70,7 @@ export default function TestModeSelector({
 
       <fieldset key={settings.mode} className="min-w-0">
         <legend className="sr-only">
-          {settings.mode === 'time' ? 'Duration in seconds' : 'Word count'}
+          {settings.mode === 'time' ? 'Duration in seconds' : settings.category === 'numbers' ? 'Number group count' : 'Word count'}
         </legend>
         <div className="flex flex-wrap items-center justify-center gap-1">
           {settings.mode === 'time'
@@ -74,7 +100,7 @@ export default function TestModeSelector({
                     className="peer sr-only"
                   />
                   <span className={optionClassName}>
-                    {words}<span className="sr-only"> words</span>
+                    {words}<span className="sr-only">{settings.category === 'numbers' ? ' number groups' : ' words'}</span>
                   </span>
                 </label>
               ))}

@@ -9,6 +9,7 @@ import type { TestSettings } from '../types/test'
 
 export default function Home() {
   const [settings, setSettings] = useState<TestSettings>({
+    category: 'english',
     mode: 'time',
     time: 30,
     words: 25,
@@ -24,12 +25,15 @@ export default function Home() {
   )
 
   function handleSettingsChange(nextSettings: TestSettings) {
+    if (nextSettings.category !== settings.category) {
+      setGeneratedWords(generateWords(100, nextSettings.category))
+    }
     setSettings(nextSettings)
     resetInput()
   }
 
   function handleRestart() {
-    setGeneratedWords(generateWords(100))
+    setGeneratedWords(generateWords(100, settings.category))
     resetInput()
     wordDisplayRef.current?.focus({ preventScroll: true })
   }

@@ -7,16 +7,16 @@ export default function Navbar() {
       >
         <a
           href="/"
-          aria-label="ZachType home"
+          aria-label="TypeLab home"
           className="flex items-center gap-3 rounded-sm text-[var(--color-text-primary)]"
         >
           <span
             aria-hidden="true"
             className="flex size-10 items-center justify-center rounded-lg bg-[var(--color-accent)] font-bold tracking-tight text-[var(--color-background)]"
           >
-            ZT
+            TL
           </span>
-          <span className="text-xl font-semibold tracking-tight">ZachType</span>
+          <span className="text-xl font-semibold tracking-tight">TypeLab</span>
         </a>
 
         <ul className="order-last flex w-full items-center justify-center gap-8 text-sm font-medium sm:order-none sm:w-auto sm:justify-start">

@@ -1,4 +1,4 @@
-# ZachType
+# TypeLab
 
 A minimal React, TypeScript, Vite, and Tailwind CSS starter.
 
@@ -33,5 +33,5 @@ src/
   index.css    Tailwind CSS entry point
 ```
 
-The homepage displays only “ZachType”. The remaining folders are placeholders
+The homepage displays only “TypeLab”. The remaining folders are placeholders
 for future development.

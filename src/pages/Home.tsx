@@ -2,6 +2,7 @@ import { useState } from 'react'
 import TestModeSelector from '../components/TestModeSelector'
 import WordDisplay from '../components/WordDisplay'
 import { sampleWords } from '../data/sampleWords'
+import { demoCharacterStates } from '../data/demoCharacterStates'
 import type { TestSettings } from '../types/test'
 
 export default function Home() {
@@ -25,7 +26,7 @@ export default function Home() {
         </h1>
         <TestModeSelector settings={settings} onChange={setSettings} />
         <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[var(--color-text-secondary)]/20 p-6 sm:min-h-80 sm:p-10">
-          <WordDisplay words={sampleWords} />
+          <WordDisplay words={sampleWords} characterStates={demoCharacterStates} />
         </div>
       </section>
     </main>

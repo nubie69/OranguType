@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --color-background: #0b1120;
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-accent: #22d3ee;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  a {
+    color: var(--color-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+  }
+}

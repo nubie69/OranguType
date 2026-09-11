@@ -97,6 +97,41 @@ test('backspace crosses a word boundary and restores the previous character stat
   assert.deepEqual(updateTypedCharacters([], 'Backspace', 7), [])
 })
 
+test('backspace corrects the current word without changing earlier words', () => {
+  const original = Object.freeze(Array.from('cat dx'))
+  let typed = updateTypedCharacters(original, 'Backspace', 7)
+  let progress = getTypingProgress(['cat', 'dog'], typed)
+  assert.deepEqual(original, Array.from('cat dx'))
+  assert.equal(progress.currentWordIndex, 1)
+  assert.equal(progress.currentCharacterIndex, 1)
+  assert.deepEqual(progress.characterStates,
+    ['correct', 'correct', 'correct', 'correct', 'correct', 'current', 'untyped'])
+  for (const key of 'og') typed = updateTypedCharacters(typed, key, 7)
+  progress = getTypingProgress(['cat', 'dog'], typed)
+  assert.deepEqual(progress.characterStates, Array(7).fill('correct'))
+  assert.equal(progress.isComplete, true)
+})
+
+test('repeated backspace stops at zero with valid character states and indexes', () => {
+  let typed = Array.from('cat dxg')
+  for (let count = 0; count < 30; count += 1) {
+    const previous = typed
+    typed = updateTypedCharacters(typed, 'Backspace', 7)
+    const progress = getTypingProgress(['cat', 'dog'], typed)
+    assert.equal(typed.length, Math.max(0, previous.length - 1))
+    assert.equal(progress.position, typed.length)
+    assert.ok(progress.currentWordIndex >= 0)
+    assert.ok(progress.currentCharacterIndex >= 0)
+    assert.equal(progress.characterStates.filter((state) => state === 'current').length, 1)
+    assert.equal(progress.characterStates[typed.length], 'current')
+    if (previous.length === 0) assert.equal(typed, previous)
+  }
+  assert.deepEqual(getTypingProgress(['cat', 'dog'], typed),
+    getTypingProgress(['cat', 'dog'], []))
+  typed = updateTypedCharacters(typed, 'c', 7)
+  assert.equal(getTypingProgress(['cat', 'dog'], typed).characterStates[0], 'correct')
+})
+
 test('ignores navigation keys and limits input, but allows correcting completed text', () => {
   const typed = Array.from('cat')
   for (const key of ['Tab', 'Enter', 'ArrowLeft', 'Shift', 'Dead']) {

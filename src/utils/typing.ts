@@ -5,7 +5,11 @@ export function updateTypedCharacters(
   key: string,
   characterCount: number,
 ): readonly string[] {
-  if (key === 'Backspace') return typed.slice(0, -1)
+  if (key === 'Backspace') {
+    // At the start, keep the same state instead of scheduling an empty update.
+    if (typed.length === 0) return typed
+    return typed.slice(0, -1)
+  }
   if (Array.from(key).length !== 1 || typed.length >= characterCount) return typed
   return [...typed, key]
 }

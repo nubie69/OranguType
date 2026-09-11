@@ -1,5 +1,28 @@
 import type { CharacterState } from '../types/character.ts'
 
+export type TypingSession = {
+  typedCharacters: readonly string[]
+  startedAt: number | null
+}
+
+export function updateTypingSession(
+  session: TypingSession,
+  key: string,
+  characterCount: number,
+  now: number,
+): TypingSession {
+  const typedCharacters = updateTypedCharacters(session.typedCharacters, key, characterCount)
+  if (typedCharacters === session.typedCharacters) return session
+
+  return {
+    typedCharacters,
+    // Keep the first accepted character's timestamp, even after deleting all input.
+    startedAt: session.startedAt ?? (
+      typedCharacters.length > session.typedCharacters.length ? now : null
+    ),
+  }
+}
+
 export function updateTypedCharacters(
   typed: readonly string[],
   key: string,

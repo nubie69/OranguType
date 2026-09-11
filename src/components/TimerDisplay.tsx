@@ -4,12 +4,14 @@ type TimerDisplayProps = {
 
 export default function TimerDisplay({ seconds }: TimerDisplayProps) {
   return (
-    <output
-      aria-label="Selected test duration"
+    <div
+      role="timer"
+      aria-label="Time remaining"
+      aria-live="off"
       className="block text-center font-mono text-3xl tabular-nums text-[var(--color-accent)] sm:text-4xl"
     >
       {seconds}
       <span className="sr-only"> seconds</span>
-    </output>
+    </div>
   )
 }

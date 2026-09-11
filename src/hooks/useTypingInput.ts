@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
-import { getTypingProgress, updateTypedCharacters } from '../utils/typing'
+import { getTypingProgress, updateTypingSession } from '../utils/typing'
+import type { TypingSession } from '../utils/typing'
 
 export default function useTypingInput(words: readonly string[]) {
-  const [typedCharacters, setTypedCharacters] = useState<readonly string[]>([])
+  const [session, setSession] = useState<TypingSession>({
+    typedCharacters: [],
+    startedAt: null,
+  })
+  const { typedCharacters, startedAt } = session
   const characterCount = Array.from(words.join(' ')).length
 
   useEffect(() => {
@@ -20,7 +25,8 @@ export default function useTypingInput(words: readonly string[]) {
       if (event.key !== 'Backspace' && Array.from(event.key).length !== 1) return
 
       event.preventDefault()
-      setTypedCharacters((typed) => updateTypedCharacters(typed, event.key, characterCount))
+      const now = performance.now()
+      setSession((current) => updateTypingSession(current, event.key, characterCount, now))
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -30,6 +36,7 @@ export default function useTypingInput(words: readonly string[]) {
   return {
     ...getTypingProgress(words, typedCharacters),
     typedCharacters,
-    resetInput: () => setTypedCharacters([]),
+    startedAt,
+    resetInput: () => setSession({ typedCharacters: [], startedAt: null }),
   }
 }

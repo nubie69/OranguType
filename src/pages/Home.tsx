@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import RestartButton from '../components/RestartButton'
 import TestModeSelector from '../components/TestModeSelector'
 import TimerDisplay from '../components/TimerDisplay'
@@ -6,8 +6,11 @@ import WordDisplay from '../components/WordDisplay'
 import { generateWords } from '../utils/generateWords'
 import useTypingInput from '../hooks/useTypingInput'
 import type { TestSettings } from '../types/test'
+import { calculateStats } from '../utils/stats'
+import type { TestResult } from '../utils/stats'
 
-export default function Home() {
+export default function Home({ onComplete }: { onComplete: (result: TestResult) => void }) {
+  const saved = useRef(false)
   const [settings, setSettings] = useState<TestSettings>({
     category: 'english',
     mode: 'time',
@@ -19,12 +22,21 @@ export default function Home() {
   const words = settings.mode === 'words'
     ? generatedWords.slice(0, settings.words)
     : generatedWords
-  const { characterStates, remainingSeconds, status, resetInput } = useTypingInput(
+  const { characterStates, remainingSeconds, status, resetInput, typedCharacters, elapsedSeconds } = useTypingInput(
     words,
     settings.mode === 'time' ? settings.time : null,
   )
+  const result = calculateStats(words, typedCharacters, elapsedSeconds)
+
+  useEffect(() => {
+    if (status !== 'finished' || saved.current) return
+    saved.current = true
+    onComplete({ ...settings, ...calculateStats(words, typedCharacters, elapsedSeconds),
+      id: crypto.randomUUID(), completedAt: new Date().toISOString(), elapsedSeconds })
+  }, [status, settings, words, typedCharacters, elapsedSeconds, onComplete])
 
   function handleSettingsChange(nextSettings: TestSettings) {
+    saved.current = false
     if (nextSettings.category !== settings.category) {
       setGeneratedWords(generateWords(100, nextSettings.category))
     }
@@ -33,6 +45,7 @@ export default function Home() {
   }
 
   function handleRestart() {
+    saved.current = false
     setGeneratedWords(generateWords(100, settings.category))
     resetInput()
     wordDisplayRef.current?.focus({ preventScroll: true })
@@ -58,7 +71,7 @@ export default function Home() {
         </div>
         {status === 'finished' && (
           <p role="status" className="text-center text-[var(--color-accent)]">
-            Time’s up. Test finished.
+            Test finished. {result.wpm} WPM · {result.accuracy}% accuracy
           </p>
         )}
         <div className="flex justify-center">

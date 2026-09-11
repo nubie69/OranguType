@@ -9,7 +9,7 @@ export default function useTypingInput(words: readonly string[], duration: numbe
   const { typedCharacters, startedAt } = session
   const characterCount = Array.from(words.join(' ')).length
   const remainingSeconds = useCountdown(duration, startedAt)
-  const status = getTestStatus(startedAt, remainingSeconds)
+  const status = session.finishedAt !== undefined ? 'finished' : getTestStatus(startedAt, remainingSeconds)
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -27,7 +27,7 @@ export default function useTypingInput(words: readonly string[], duration: numbe
 
       event.preventDefault()
       const now = performance.now()
-      setSession((current) => updateTypingSession(current, event.key, characterCount, now, duration))
+      setSession((current) => updateTypingSession(current, event.key, characterCount, now, duration, true))
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -40,6 +40,9 @@ export default function useTypingInput(words: readonly string[], duration: numbe
     remainingSeconds,
     typedCharacters,
     startedAt,
+    elapsedSeconds: startedAt === null ? 0 : session.finishedAt !== undefined
+      ? Math.max(0.001, (session.finishedAt - startedAt) / 1000)
+      : status === 'finished' ? duration ?? 0 : 0,
     resetInput: () => setSession(createTypingSession()),
   }
 }

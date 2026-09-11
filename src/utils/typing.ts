@@ -4,6 +4,7 @@ import { getRemainingSeconds } from './timer.ts'
 export type TypingSession = {
   typedCharacters: readonly string[]
   startedAt: number | null
+  finishedAt?: number
 }
 
 export function createTypingSession(): TypingSession {
@@ -16,7 +17,9 @@ export function updateTypingSession(
   characterCount: number,
   now: number,
   duration: number | null = null,
+  finishWhenComplete = false,
 ): TypingSession {
+  if (session.finishedAt !== undefined) return session
   // Check the actual deadline, even if a delayed timer callback has not rendered yet.
   if (duration !== null && session.startedAt !== null
     && getRemainingSeconds(duration, session.startedAt, now) === 0) return session
@@ -26,6 +29,8 @@ export function updateTypingSession(
 
   return {
     typedCharacters,
+    ...(finishWhenComplete && typedCharacters.length === characterCount
+      ? { finishedAt: now } : {}),
     // Keep the first accepted character's timestamp, even after deleting all input.
     startedAt: session.startedAt ?? (
       typedCharacters.length > session.typedCharacters.length ? now : null

@@ -1,4 +1,4 @@
-export default function Navbar() {
+export default function Navbar({ page }: { page: string }) {
   return (
     <header className="border-b border-[var(--color-text-secondary)]/20 bg-[var(--color-background)]">
       <nav
@@ -6,7 +6,7 @@ export default function Navbar() {
         className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-4 px-6 py-4"
       >
         <a
-          href="/"
+          href="#type"
           aria-label="TypeLab home"
           className="flex items-center gap-3 rounded-sm text-[var(--color-text-primary)]"
         >
@@ -22,9 +22,9 @@ export default function Navbar() {
         <ul className="order-last flex w-full items-center justify-center gap-8 text-sm font-medium sm:order-none sm:w-auto sm:justify-start">
           <li>
             <a
-              href="/"
-              aria-current="page"
-              className="inline-flex min-h-11 items-center rounded-sm text-[var(--color-accent)]"
+              href="#type"
+              aria-current={page !== '#stats' && page !== '#history' ? 'page' : undefined}
+              className="inline-flex min-h-11 items-center rounded-sm text-[var(--color-text-secondary)] aria-[current=page]:text-[var(--color-accent)]"
             >
               Type
             </a>
@@ -32,6 +32,7 @@ export default function Navbar() {
           <li>
             <a
               href="#stats"
+              aria-current={page === '#stats' ? 'page' : undefined}
               className="inline-flex min-h-11 items-center rounded-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]"
             >
               Stats
@@ -40,6 +41,7 @@ export default function Navbar() {
           <li>
             <a
               href="#history"
+              aria-current={page === '#history' ? 'page' : undefined}
               className="inline-flex min-h-11 items-center rounded-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]"
             >
               History

@@ -3,6 +3,7 @@
 :root {
   color-scheme: dark;
   --color-background: #1c1915;
+  --color-surface: #25211c;
   --color-text-primary: #eee7dd;
   --color-text-secondary: #b0a69a;
   --color-accent: #e59a70;
@@ -20,6 +21,25 @@
 }
 
 @layer components {
+  .metric-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 112px;
+    border: 1px solid #b0a69a26;
+    border-radius: 1rem;
+    background: var(--color-surface);
+  }
+  .metric-label { color: var(--color-text-secondary); font-size: 0.75rem; }
+  .metric-value { color: var(--color-accent); font-size: clamp(1.5rem, 4vw, 2.25rem); font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .keycap { border: 1px solid #b0a69a40; border-bottom-width: 3px; border-radius: 5px; padding: 3px 6px; font-size: 10px; }
+  .typing-stage { box-shadow: 0 16px 60px #00000020; }
+  .typing-stage:focus-within { border-color: var(--color-accent); }
+  nav a[aria-current="page"] { background: #e59a701a; color: var(--color-accent); }
+  nav ul a { padding-inline: 1rem; border-radius: 0.75rem; transition: background-color 150ms; }
+  nav ul a:hover { background: #e59a7010; }
   .typing-caret {
     position: absolute;
     top: 50%;
@@ -46,6 +66,7 @@
     min-width: 320px;
     min-height: 100vh;
     background-color: var(--color-background);
+    background-image: radial-gradient(ellipse at 5% 0%, #e59a7010, transparent 55%), radial-gradient(ellipse at 100% 100%, #b1bc7b08, transparent 50%);
     color: var(--color-text-primary);
     font-family: ui-sans-serif, system-ui, sans-serif;
     line-height: 1.5;

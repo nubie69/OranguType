@@ -11,6 +11,14 @@ export default function useTypingInput(words: readonly string[], duration: numbe
   const characterCount = Array.from(words.join(' ')).length
   const remainingSeconds = useCountdown(duration, startedAt)
   const status = session.finishedAt !== undefined ? 'finished' : getTestStatus(startedAt, remainingSeconds)
+  const [now, setNow] = useState(() => performance.now())
+
+  useEffect(() => {
+    if (status !== 'running') return
+    setNow(performance.now())
+    const interval = window.setInterval(() => setNow(performance.now()), 250)
+    return () => window.clearInterval(interval)
+  }, [status, startedAt])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -37,7 +45,7 @@ export default function useTypingInput(words: readonly string[], duration: numbe
 
   const elapsedSeconds = startedAt === null ? 0 : session.finishedAt !== undefined
     ? Math.max(0.001, (session.finishedAt - startedAt) / 1000)
-    : status === 'finished' ? duration ?? 0 : 0
+    : status === 'finished' ? duration ?? 0 : Math.max(0, (now - startedAt) / 1000)
 
   return {
     ...getTypingProgress(words, typedCharacters, status === 'finished'),

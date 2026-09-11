@@ -33,23 +33,31 @@ function LineGraph({ points, metric, label, color }: {
   )
 }
 
-export default function TestResults({ wpm, accuracy, elapsedSeconds, points, timedOut }: {
+export default function TestResults({ wpm, accuracy, elapsedSeconds, points, timedOut, onTryAgain }: {
   wpm: number
   accuracy: number
   elapsedSeconds: number
   points: PerformancePoint[]
   timedOut: boolean
+  onTryAgain: () => void
 }) {
   return (
     <section aria-labelledby="test-results-heading" className="space-y-5 rounded-2xl border border-[var(--color-accent)]/30 p-5 sm:p-6">
       <h2 id="test-results-heading" className="text-xl font-semibold">Your results</h2>
       <p role="status" className="sr-only">{timedOut ? "Time's up." : 'Test finished.'} {wpm} WPM and {accuracy}% accuracy.</p>
-      <dl className="grid grid-cols-3 gap-3">
-        {[[`${wpm}`, 'WPM'], [`${accuracy}%`, 'Accuracy'], [`${Number(elapsedSeconds.toFixed(1))}s`, 'Duration']].map(([value, label]) => <div key={label}>
+      <dl className="grid grid-cols-2 gap-4 text-center">
+        {[[`${wpm}`, 'WPM'], [`${accuracy}%`, 'Accuracy']].map(([value, label]) => <div key={label}>
           <dt className="text-sm text-[var(--color-text-secondary)]">{label}</dt>
-          <dd className="mt-1 text-2xl font-semibold text-[var(--color-accent)] sm:text-4xl">{value}</dd>
+          <dd className="mt-2 text-5xl font-semibold text-[var(--color-accent)] sm:text-7xl">{value}</dd>
         </div>)}
       </dl>
+      <p className="text-center text-sm text-[var(--color-text-secondary)]">{Number(elapsedSeconds.toFixed(1))} seconds</p>
+      <div className="flex justify-center">
+        <button type="button" onClick={onTryAgain}
+          className="min-h-11 cursor-pointer rounded-lg bg-[var(--color-accent)] px-8 py-3 font-semibold text-[var(--color-background)] transition-opacity hover:opacity-90">
+          Try again
+        </button>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <LineGraph points={points} metric="wpm" label="WPM" color="var(--color-accent)" />
         <LineGraph points={points} metric="accuracy" label="Accuracy" color="#a78bfa" />

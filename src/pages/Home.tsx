@@ -20,6 +20,8 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
   })
   const [generatedWords, setGeneratedWords] = useState(() => generateWords(100))
   const wordDisplayRef = useRef<HTMLDivElement>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const focusPractice = useRef(false)
   const words = settings.mode === 'words'
     ? generatedWords.slice(0, settings.words)
     : generatedWords
@@ -28,6 +30,14 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
     settings.mode === 'time' ? settings.time : null,
   )
   const result = calculateStats(words, typedCharacters, elapsedSeconds)
+
+  useEffect(() => {
+    if (status === 'finished') headingRef.current?.focus()
+    else if (focusPractice.current) {
+      focusPractice.current = false
+      wordDisplayRef.current?.focus({ preventScroll: true })
+    }
+  }, [status, generatedWords])
 
   useEffect(() => {
     if (status !== 'finished' || saved.current) return
@@ -47,9 +57,9 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
 
   function handleRestart() {
     saved.current = false
+    focusPractice.current = true
     setGeneratedWords(generateWords(100, settings.category))
     resetInput()
-    wordDisplayRef.current?.focus({ preventScroll: true })
   }
 
   return (
@@ -60,23 +70,31 @@ export default function Home({ onComplete }: { onComplete: (result: TestResult) 
         className="w-full min-w-0 max-w-4xl space-y-6 sm:space-y-8"
       >
         <h1
+          ref={headingRef}
+          tabIndex={-1}
           id="typing-test-heading"
           className="text-center text-2xl font-semibold tracking-tight sm:text-3xl"
         >
-          Typing test
+          {status === 'finished' ? 'Test complete' : 'Typing test'}
         </h1>
-        <TestModeSelector settings={settings} onChange={handleSettingsChange} />
-        {remainingSeconds !== null && <TimerDisplay seconds={remainingSeconds} />}
-        <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[var(--color-text-secondary)]/20 p-6 sm:min-h-80 sm:p-10">
-          <WordDisplay ref={wordDisplayRef} words={words} characterStates={characterStates} isFinished={status === 'finished'} />
-        </div>
-        {status === 'finished' && (
-          <TestResults wpm={result.wpm} accuracy={result.accuracy} elapsedSeconds={elapsedSeconds}
-            points={performanceSeries} timedOut={settings.mode === 'time' && elapsedSeconds === settings.time} />
+        {status === 'finished' ? (
+          <>
+            <TestResults wpm={result.wpm} accuracy={result.accuracy} elapsedSeconds={elapsedSeconds}
+              points={performanceSeries} timedOut={settings.mode === 'time' && elapsedSeconds === settings.time}
+              onTryAgain={handleRestart} />
+          </>
+        ) : (
+          <>
+            <TestModeSelector settings={settings} onChange={handleSettingsChange} />
+            {remainingSeconds !== null && <TimerDisplay seconds={remainingSeconds} />}
+            <div className="flex min-h-64 items-center justify-center rounded-2xl border border-[var(--color-text-secondary)]/20 p-6 sm:min-h-80 sm:p-10">
+              <WordDisplay ref={wordDisplayRef} words={words} characterStates={characterStates} />
+            </div>
+            <div className="flex justify-center">
+              <RestartButton onRestart={handleRestart} />
+            </div>
+          </>
         )}
-        <div className="flex justify-center">
-          <RestartButton onRestart={handleRestart} />
-        </div>
       </section>
     </main>
   )
